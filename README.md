@@ -1,5 +1,5 @@
 LeetCode Web App
 
-#Technologies
+## Technologies
 - Next JS
 - GraphQL
