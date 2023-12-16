@@ -1,22 +1,13 @@
 // index.js
 
 const graphqlClient = require('./graphqlClient');
-
+const fs = require('fs');
 // GraphQL API URL
 const apiUrl = 'https://leetcode.com/graphql/';
 
-// GraphQL query string
-const query = `
-    query questionContent($titleSlug: String!) {
-        question(titleSlug: $titleSlug) {
-        content
-        mysqlSchemas
-        }
-    }
-`;
-
 const queries = [
     {
+      title: 'questionContent',
       query: `
       query questionContent($titleSlug: String!) {
         question(titleSlug: $titleSlug) {
@@ -27,9 +18,10 @@ const queries = [
       `,
       variables: {
         titleSlug: 'two-sum',
-      },
+      }
     },
     {
+      title: 'questionTitle',
       query: `
       query questionTitle($titleSlug: String!) {
         question(titleSlug: $titleSlug) {
@@ -46,7 +38,54 @@ const queries = [
       `,
       variables: {
         titleSlug: 'two-sum',
-      },
+      }
+    },
+    {
+        title: '',
+        query: `
+        query questionStats($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+              stats
+            }
+          }
+        `,
+        variables: {
+          titleSlug: 'two-sum',
+        }
+    },
+    {
+        title: 'problemsetQuestionList',
+        query: `
+        query problemsetQuestionList($categorySlug: String, $limit: Int, $skip: Int, $filters: QuestionListFilterInput) {
+            problemsetQuestionList: questionList(
+              categorySlug: $categorySlug
+              limit: $limit
+              skip: $skip
+              filters: $filters
+            ) {
+              total: totalNum
+              questions: data {
+                acRate
+                difficulty
+                freqBar
+                frontendQuestionId: questionFrontendId
+                isFavor
+                paidOnly: isPaidOnly
+                status
+                title
+                titleSlug
+                topicTags {
+                  name
+                  id
+                  slug
+                }
+                hasSolution
+                hasVideoSolution
+              }
+            }
+          }
+        `,
+        variables: {"categorySlug": "", "skip": 0, "limit": 50, "filters": {}}
     },
 ];
   
@@ -72,10 +111,14 @@ const options = {
 //   });
 
 
+    let i = 0;
   graphqlClient(apiUrl, queries, options)
   .then((responses) => {
     for (const response of responses) {
       console.log('GraphQL response:', response);
+      var fileName = queries[i++].title + ".json";
+      fs.writeFileSync(fileName, JSON.stringify(response, null, 2));
+
     }
   })
   .catch((error) => {
