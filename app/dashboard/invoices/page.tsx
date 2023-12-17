@@ -1,6 +1,11 @@
-
 export default function Page() {
+
     return (
-        <p>ok</p>
+
+        <div className="">
+  Hello World
+  <button className="btn btn-primary">halloween</button>
+
+</div>
     );
 }
